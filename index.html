@@ -1,0 +1,831 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; }
+
+  :root {
+    --idm-bg: #ECE9D8;
+    --idm-toolbar: #D4D0C8;
+    --idm-border-light: #FFFFFF;
+    --idm-border-dark: #808080;
+    --idm-border-darker: #404040;
+    --idm-blue: #003399;
+    --idm-sel: #316AC5;
+    --idm-header: #D8D0C8;
+    --idm-row-alt: #F5F3EC;
+    --idm-row: #FFFFFF;
+    --idm-text: #000000;
+    --idm-text-gray: #555;
+    --idm-green: #00A000;
+    --idm-red: #CC0000;
+    --idm-orange: #CC6600;
+    --idm-menu-bg: #F0EFE7;
+    --idm-status: #D4D0C8;
+    --idm-prog-bg: #C0C0C0;
+    --idm-prog-fill: #3399FF;
+    --idm-prog-shine: #66BBFF;
+    --idm-seg: #005500;
+  }
+
+  #app {
+    width: 100%;
+    min-height: 520px;
+    background: var(--idm-bg);
+    border: 2px solid var(--idm-border-dark);
+    font-size: 11px;
+    color: var(--idm-text);
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    border-radius: 0;
+  }
+
+  /* Title Bar */
+  #titlebar {
+    background: linear-gradient(to bottom, #3168C4 0%, #1844A0 50%, #3168C4 100%);
+    height: 22px;
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    gap: 4px;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+  }
+  #titlebar .title-icon { width: 16px; height: 16px; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect fill="%23FF6600" x="2" y="10" width="12" height="3" rx="1"/><polygon fill="%2300AAFF" points="8,2 13,8 10,8 10,10 6,10 6,8 3,8"/></svg>') center/contain no-repeat; }
+  #titlebar .win-btns { margin-left: auto; display: flex; gap: 2px; }
+  #titlebar .win-btn { width: 16px; height: 14px; border: 1px solid rgba(255,255,255,0.4); border-radius: 2px; cursor: pointer; font-size: 9px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.2); color: white; }
+  #titlebar .win-btn:hover { background: rgba(255,255,255,0.4); }
+  #titlebar .win-btn.close:hover { background: #CC0000; }
+
+  /* Menu Bar */
+  #menubar {
+    background: var(--idm-menu-bg);
+    border-bottom: 1px solid var(--idm-border-dark);
+    display: flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 2px;
+  }
+  .menu-item {
+    padding: 2px 8px;
+    cursor: pointer;
+    border-radius: 2px;
+    font-size: 11px;
+  }
+  .menu-item:hover { background: var(--idm-sel); color: white; }
+
+  /* Toolbar */
+  #toolbar {
+    background: linear-gradient(to bottom, #E8E4DC 0%, #D0CCC4 100%);
+    border-bottom: 2px solid var(--idm-border-dark);
+    display: flex;
+    align-items: center;
+    padding: 3px 4px;
+    gap: 2px;
+    flex-wrap: wrap;
+    min-height: 52px;
+  }
+  .tb-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 44px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 9px;
+    color: var(--idm-text);
+    background: transparent;
+    gap: 2px;
+    text-align: center;
+  }
+  .tb-btn:hover {
+    border: 1px solid var(--idm-border-dark);
+    background: linear-gradient(to bottom, #FFF8E8 0%, #E8DCC8 100%);
+    box-shadow: inset 1px 1px 0 #fff;
+  }
+  .tb-btn:active { background: linear-gradient(to bottom, #D8CCC0 0%, #E8E0D4 100%); }
+  .tb-btn i { font-size: 20px; color: var(--idm-blue); }
+  .tb-btn i.orange { color: #CC5500; }
+  .tb-btn i.green { color: #006600; }
+  .tb-btn i.red { color: #880000; }
+  .tb-sep { width: 1px; height: 40px; background: var(--idm-border-dark); margin: 0 4px; box-shadow: 1px 0 0 white; }
+
+  /* Main Layout */
+  #main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    border-top: 1px solid var(--idm-border-light);
+  }
+
+  /* Left Panel (Categories) */
+  #sidebar {
+    width: 140px;
+    min-width: 140px;
+    background: var(--idm-toolbar);
+    border-right: 2px solid var(--idm-border-dark);
+    overflow-y: auto;
+    font-size: 11px;
+  }
+  .cat-header {
+    background: linear-gradient(to bottom, #D0CDC4 0%, #B8B4AC 100%);
+    padding: 3px 6px;
+    font-weight: bold;
+    font-size: 10px;
+    color: #333;
+    border-bottom: 1px solid var(--idm-border-dark);
+    border-top: 1px solid white;
+    cursor: pointer;
+  }
+  .cat-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .cat-item:hover { background: var(--idm-sel); color: white; }
+  .cat-item.active { background: var(--idm-sel); color: white; }
+  .cat-item i { font-size: 14px; }
+  .cat-item i.col-all { color: #0044AA; }
+  .cat-item i.col-video { color: #8800AA; }
+  .cat-item i.col-music { color: #007700; }
+  .cat-item i.col-img { color: #AA6600; }
+  .cat-item i.col-zip { color: #AA3300; }
+  .cat-item i.col-doc { color: #004488; }
+  .cat-item i.col-prog { color: #555; }
+  .cat-item.active i { color: white !important; }
+  .cat-count { margin-left: auto; background: rgba(0,0,0,0.15); border-radius: 8px; padding: 0 5px; font-size: 9px; }
+  .cat-item.active .cat-count { background: rgba(255,255,255,0.3); }
+
+  /* Right Panel */
+  #content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* File List */
+  #file-list { flex: 1; overflow-y: auto; border-bottom: 2px solid var(--idm-border-dark); }
+
+  /* Column Headers */
+  #col-header {
+    display: grid;
+    grid-template-columns: 24px 2fr 90px 80px 70px 70px 80px;
+    background: linear-gradient(to bottom, #E0DCD4 0%, #C8C4BC 100%);
+    border-bottom: 2px solid var(--idm-border-dark);
+    position: sticky; top: 0; z-index: 5;
+    font-size: 10px; font-weight: bold; color: #333;
+  }
+  .col-h {
+    padding: 3px 4px;
+    border-right: 1px solid var(--idm-border-dark);
+    border-left: 1px solid white;
+    white-space: nowrap; overflow: hidden;
+    cursor: pointer;
+  }
+  .col-h:hover { background: rgba(255,255,255,0.3); }
+
+  /* Download Row */
+  .dl-row {
+    display: grid;
+    grid-template-columns: 24px 2fr 90px 80px 70px 70px 80px;
+    border-bottom: 1px solid #D8D4CC;
+    cursor: pointer;
+    min-height: 36px;
+    align-items: center;
+  }
+  .dl-row:nth-child(even) { background: var(--idm-row-alt); }
+  .dl-row:nth-child(odd) { background: var(--idm-row); }
+  .dl-row:hover { background: #D8E8F8; }
+  .dl-row.selected { background: var(--idm-sel) !important; color: white; }
+  .dl-row.selected .seg-bar .seg { background: #88CCFF !important; }
+  .dl-row.selected .status-txt { color: white !important; }
+  .dl-cell { padding: 2px 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 10px; }
+  .dl-cell.name-cell { display: flex; flex-direction: column; padding: 3px 4px; gap: 1px; }
+  .dl-fname { font-size: 10px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dl-url { font-size: 9px; color: #777; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dl-row.selected .dl-url { color: #AADDFF; }
+
+  .icon-cell { display: flex; align-items: center; justify-content: center; }
+  .icon-cell i { font-size: 16px; }
+
+  /* Progress with segments */
+  .prog-wrap { position: relative; height: 14px; background: #C8C4BC; border: 1px solid #888; border-radius: 1px; overflow: hidden; margin: 1px 0; }
+  .prog-fill { height: 100%; position: absolute; left: 0; top: 0; transition: width 0.3s; }
+  .seg-bar { display: flex; height: 14px; background: #C8C4BC; border: 1px solid #888; overflow: hidden; gap: 1px; padding: 1px; }
+  .seg { height: 100%; border-radius: 1px; transition: width 0.3s; }
+  .dl-row.selected .seg-bar { background: #1844A0; border-color: #88BBFF; }
+
+  /* Status colors */
+  .status-done { color: var(--idm-green); font-weight: bold; }
+  .status-dl { color: #0044CC; font-weight: bold; }
+  .status-pause { color: var(--idm-orange); }
+  .status-queue { color: #666; }
+  .dl-row.selected .status-done,
+  .dl-row.selected .status-dl,
+  .dl-row.selected .status-pause,
+  .dl-row.selected .status-queue { color: white; }
+
+  /* Bottom Info Panel */
+  #info-panel {
+    height: 80px;
+    background: var(--idm-toolbar);
+    border-top: 1px solid white;
+    display: flex;
+    gap: 0;
+    overflow: hidden;
+  }
+  .info-box {
+    flex: 1;
+    padding: 6px 8px;
+    border-right: 2px solid var(--idm-border-dark);
+    font-size: 10px;
+    overflow: hidden;
+  }
+  .info-box h4 { font-size: 10px; font-weight: bold; color: var(--idm-blue); margin-bottom: 4px; border-bottom: 1px solid #AAA; padding-bottom: 2px; }
+  .info-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+  .info-label { color: #555; }
+  .info-val { font-weight: bold; color: #000; }
+
+  /* Speed Gauge */
+  #gauge-box {
+    width: 130px;
+    min-width: 130px;
+    background: #1A1A2E;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+  }
+  #gauge-box canvas { width: 90px !important; height: 50px !important; }
+  #speed-label { color: #00FF88; font-size: 10px; font-weight: bold; font-family: 'Courier New', monospace; text-align: center; margin-top: 2px; }
+  #speed-unit { color: #88FFCC; font-size: 9px; font-family: 'Courier New', monospace; }
+
+  /* Status Bar */
+  #statusbar {
+    background: var(--idm-status);
+    border-top: 2px solid var(--idm-border-dark);
+    display: flex;
+    align-items: center;
+    height: 18px;
+    font-size: 10px;
+    gap: 0;
+  }
+  .stat-seg {
+    padding: 0 8px;
+    border-right: 1px solid var(--idm-border-dark);
+    border-left: 1px solid white;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .stat-seg i { font-size: 11px; margin-right: 3px; }
+
+  /* Add Dialog Overlay */
+  #add-dialog {
+    display: none;
+    position: absolute;
+    top: 80px; left: 50%; transform: translateX(-50%);
+    width: 420px;
+    background: var(--idm-bg);
+    border: 2px solid var(--idm-border-dark);
+    box-shadow: 4px 4px 8px rgba(0,0,0,0.4);
+    z-index: 100;
+    font-size: 11px;
+  }
+  #add-dialog .dlg-title {
+    background: linear-gradient(to bottom, #3168C4 0%, #1844A0 100%);
+    color: white;
+    padding: 3px 8px;
+    font-weight: bold;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  #add-dialog .dlg-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  #add-dialog label { font-size: 10px; color: #333; margin-bottom: 2px; display: block; }
+  #add-dialog input[type=text], #add-dialog select {
+    width: 100%; padding: 3px 5px; border: 2px inset #888;
+    font-size: 11px; background: white;
+  }
+  #add-dialog input[type=text]:focus { outline: 1px solid var(--idm-blue); }
+  .dlg-row { display: flex; gap: 8px; }
+  .dlg-row > div { flex: 1; }
+  .dlg-btns { display: flex; justify-content: flex-end; gap: 6px; padding: 6px 10px; border-top: 1px solid #BBB; }
+  .dlg-btn {
+    padding: 3px 16px; font-size: 11px; cursor: pointer;
+    border: 2px outset #AAA;
+    background: linear-gradient(to bottom, #F0ECE4 0%, #D8D4CC 100%);
+  }
+  .dlg-btn:hover { background: linear-gradient(to bottom, #FFFFFF 0%, #E8E4DC 100%); }
+  .dlg-btn:active { border-style: inset; }
+  .dlg-btn.primary { background: linear-gradient(to bottom, #5588DD 0%, #2255BB 100%); color: white; border-color: #1144AA; }
+  .dlg-btn.primary:hover { background: linear-gradient(to bottom, #7799EE 0%, #3366CC 100%); }
+
+  #app-wrap { position: relative; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 16px; }
+  ::-webkit-scrollbar-track { background: #D4D0C8; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #E8E4DC 0%, #C0BDB4 50%, #E8E4DC 100%); border: 1px solid #888; }
+  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, #F0EDE4 0%, #C8C5BC 50%, #F0EDE4 100%); }
+  ::-webkit-scrollbar-button { background: linear-gradient(to bottom, #E0DCD4 0%, #C8C4BC 100%); height: 16px; border: 1px solid #888; }
+</style>
+
+<h2 class="sr-only">IDM-style download manager application showing downloads organized by file type categories</h2>
+
+<div id="app-wrap">
+<div id="app">
+
+  <!-- Title Bar -->
+  <div id="titlebar">
+    <div class="title-icon"></div>
+    <span>Internet Download Manager 6.42</span>
+    <div class="win-btns">
+      <div class="win-btn">_</div>
+      <div class="win-btn">□</div>
+      <div class="win-btn close">✕</div>
+    </div>
+  </div>
+
+  <!-- Menu Bar -->
+  <div id="menubar">
+    <div class="menu-item">Downloads</div>
+    <div class="menu-item">Edit</div>
+    <div class="menu-item">View</div>
+    <div class="menu-item">Options</div>
+    <div class="menu-item">Queue</div>
+    <div class="menu-item">Scheduler</div>
+    <div class="menu-item">Help</div>
+  </div>
+
+  <!-- Toolbar -->
+  <div id="toolbar">
+    <div class="tb-btn" onclick="openAddDialog()">
+      <i class="ti ti-plus orange" aria-hidden="true"></i>
+      <span>Add URL</span>
+    </div>
+    <div class="tb-btn" onclick="resumeSelected()">
+      <i class="ti ti-player-play green" aria-hidden="true"></i>
+      <span>Resume</span>
+    </div>
+    <div class="tb-btn" onclick="pauseSelected()">
+      <i class="ti ti-player-pause" aria-hidden="true"></i>
+      <span>Pause</span>
+    </div>
+    <div class="tb-btn" onclick="deleteSelected()">
+      <i class="ti ti-trash red" aria-hidden="true"></i>
+      <span>Delete</span>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-btn">
+      <i class="ti ti-folder" aria-hidden="true"></i>
+      <span>Open Folder</span>
+    </div>
+    <div class="tb-btn">
+      <i class="ti ti-settings" aria-hidden="true"></i>
+      <span>Options</span>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-btn">
+      <i class="ti ti-refresh" aria-hidden="true"></i>
+      <span>Refresh</span>
+    </div>
+    <div class="tb-btn">
+      <i class="ti ti-calendar" aria-hidden="true"></i>
+      <span>Scheduler</span>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-btn">
+      <i class="ti ti-chart-bar" style="color:#336699" aria-hidden="true"></i>
+      <span>Speed</span>
+    </div>
+    <div class="tb-btn" onclick="resumeAll()">
+      <i class="ti ti-arrows-right green" aria-hidden="true"></i>
+      <span>Resume All</span>
+    </div>
+    <div class="tb-btn" onclick="pauseAll()">
+      <i class="ti ti-player-stop" style="color:#AA4400" aria-hidden="true"></i>
+      <span>Stop All</span>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div id="main">
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div class="cat-header">▼ CATEGORIES</div>
+      <div class="cat-item active" data-cat="all" onclick="setCategory('all',this)">
+        <i class="ti ti-download col-all" aria-hidden="true"></i>
+        <span>All Downloads</span>
+        <span class="cat-count" id="cnt-all">0</span>
+      </div>
+      <div class="cat-item" data-cat="Downloading" onclick="setCategory('Downloading',this)">
+        <i class="ti ti-arrow-down col-all" aria-hidden="true"></i>
+        <span>Downloading</span>
+        <span class="cat-count" id="cnt-Downloading">0</span>
+      </div>
+      <div class="cat-item" data-cat="Completed" onclick="setCategory('Completed',this)">
+        <i class="ti ti-check col-all" aria-hidden="true"></i>
+        <span>Completed</span>
+        <span class="cat-count" id="cnt-Completed">0</span>
+      </div>
+      <div class="cat-item" data-cat="Paused" onclick="setCategory('Paused',this)">
+        <i class="ti ti-pause col-all" aria-hidden="true"></i>
+        <span>Paused</span>
+        <span class="cat-count" id="cnt-Paused">0</span>
+      </div>
+      <div class="cat-header">▼ FILE TYPES</div>
+      <div class="cat-item" data-cat="Videos" onclick="setCategory('Videos',this)">
+        <i class="ti ti-device-tv col-video" aria-hidden="true"></i>
+        <span>Videos</span>
+        <span class="cat-count" id="cnt-Videos">0</span>
+      </div>
+      <div class="cat-item" data-cat="Music" onclick="setCategory('Music',this)">
+        <i class="ti ti-music col-music" aria-hidden="true"></i>
+        <span>Music</span>
+        <span class="cat-count" id="cnt-Music">0</span>
+      </div>
+      <div class="cat-item" data-cat="Images" onclick="setCategory('Images',this)">
+        <i class="ti ti-photo col-img" aria-hidden="true"></i>
+        <span>Images</span>
+        <span class="cat-count" id="cnt-Images">0</span>
+      </div>
+      <div class="cat-item" data-cat="Compressed" onclick="setCategory('Compressed',this)">
+        <i class="ti ti-file-zip col-zip" aria-hidden="true"></i>
+        <span>Compressed</span>
+        <span class="cat-count" id="cnt-Compressed">0</span>
+      </div>
+      <div class="cat-item" data-cat="Documents" onclick="setCategory('Documents',this)">
+        <i class="ti ti-file-text col-doc" aria-hidden="true"></i>
+        <span>Documents</span>
+        <span class="cat-count" id="cnt-Documents">0</span>
+      </div>
+      <div class="cat-item" data-cat="Programs" onclick="setCategory('Programs',this)">
+        <i class="ti ti-device-desktop col-prog" aria-hidden="true"></i>
+        <span>Programs</span>
+        <span class="cat-count" id="cnt-Programs">0</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div id="content">
+      <!-- Column Headers -->
+      <div id="col-header">
+        <div class="col-h" style="border-left:none;"></div>
+        <div class="col-h">File Name</div>
+        <div class="col-h">Size</div>
+        <div class="col-h">Progress</div>
+        <div class="col-h">Speed</div>
+        <div class="col-h">Time Left</div>
+        <div class="col-h">Status</div>
+      </div>
+
+      <!-- File List -->
+      <div id="file-list"></div>
+
+      <!-- Info Panel -->
+      <div id="info-panel">
+        <div class="info-box" id="info-left">
+          <h4>File Information</h4>
+          <div class="info-row"><span class="info-label">Select a download to view details</span></div>
+        </div>
+        <div class="info-box" id="info-right" style="max-width:200px;">
+          <h4>Connections</h4>
+          <div id="seg-visual" style="display:flex;gap:2px;height:40px;align-items:flex-end;"></div>
+        </div>
+        <div id="gauge-box">
+          <canvas id="gauge" width="90" height="50"></canvas>
+          <div id="speed-label">0.00</div>
+          <div id="speed-unit">MB/s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div id="statusbar">
+    <div class="stat-seg"><i class="ti ti-download" aria-hidden="true"></i><span id="stat-count">0 downloads</span></div>
+    <div class="stat-seg"><i class="ti ti-check" style="color:green" aria-hidden="true"></i><span id="stat-done">0 completed</span></div>
+    <div class="stat-seg"><i class="ti ti-bolt" style="color:#CC6600" aria-hidden="true"></i><span id="stat-speed">0 KB/s total</span></div>
+    <div class="stat-seg" style="margin-left:auto;border-left:1px solid #888;">Ready</div>
+  </div>
+
+</div>
+
+<!-- Add URL Dialog -->
+<div id="add-dialog">
+  <div class="dlg-title">
+    <i class="ti ti-plus" aria-hidden="true"></i> Add New Download
+  </div>
+  <div class="dlg-body">
+    <div>
+      <label>URL to Download:</label>
+      <input type="text" id="dlg-url" placeholder="https://example.com/file.mp4" />
+    </div>
+    <div class="dlg-row">
+      <div>
+        <label>File Name:</label>
+        <input type="text" id="dlg-name" placeholder="Auto-detect" />
+      </div>
+      <div>
+        <label>File Type:</label>
+        <select id="dlg-type">
+          <option value="">Auto-detect</option>
+          <option value="Videos">Video (.mp4, .mkv)</option>
+          <option value="Music">Music (.mp3, .flac)</option>
+          <option value="Images">Image (.jpg, .png)</option>
+          <option value="Compressed">Archive (.zip, .rar)</option>
+          <option value="Documents">Document (.pdf, .docx)</option>
+          <option value="Programs">Program (.exe, .msi)</option>
+        </select>
+      </div>
+    </div>
+    <div class="dlg-row">
+      <div>
+        <label>Save To:</label>
+        <input type="text" id="dlg-path" placeholder="C:\Users\Downloads\" />
+      </div>
+      <div>
+        <label>Connections:</label>
+        <select id="dlg-conn">
+          <option value="4">4 connections</option>
+          <option value="8" selected>8 connections</option>
+          <option value="16">16 connections</option>
+          <option value="32">32 connections</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="dlg-btns">
+    <button class="dlg-btn" onclick="closeAddDialog()">Cancel</button>
+    <button class="dlg-btn primary" onclick="addDownload()">Start Download ↓</button>
+  </div>
+</div>
+</div>
+
+<script>
+const EXT_MAP = {
+  mp4:'Videos',mkv:'Videos',avi:'Videos',mov:'Videos',webm:'Videos',flv:'Videos',
+  mp3:'Music',flac:'Music',wav:'Music',aac:'Music',ogg:'Music',wma:'Music',
+  jpg:'Images',jpeg:'Images',png:'Images',gif:'Images',bmp:'Images',svg:'Images',webp:'Images',
+  zip:'Compressed',rar:'Compressed','7z':'Compressed',tar:'Compressed',gz:'Compressed',bz2:'Compressed',
+  pdf:'Documents',doc:'Documents',docx:'Documents',xls:'Documents',xlsx:'Documents',txt:'Documents',
+  exe:'Programs',msi:'Programs',apk:'Programs',dmg:'Programs',deb:'Programs',
+};
+const CAT_ICONS = {
+  Videos:['ti-device-tv','#7700AA'],Music:['ti-music','#007700'],
+  Images:['ti-photo','#AA6600'],Compressed:['ti-file-zip','#AA3300'],
+  Documents:['ti-file-text','#004488'],Programs:['ti-device-desktop','#555555'],
+};
+const STATUS_COLORS = {Completed:'status-done',Downloading:'status-dl',Paused:'status-pause',Queued:'status-queue'};
+const STATUS_ICONS = {Completed:'ti-check',Downloading:'ti-arrow-down',Paused:'ti-player-pause',Queued:'ti-clock'};
+
+let downloads = [];
+let selectedId = null;
+let currentCat = 'all';
+let nextId = 1;
+
+function sizeStr(bytes) {
+  if(bytes>=1073741824) return (bytes/1073741824).toFixed(2)+' GB';
+  if(bytes>=1048576) return (bytes/1048576).toFixed(1)+' MB';
+  return (bytes/1024).toFixed(0)+' KB';
+}
+function speedStr(bps) {
+  if(bps>=1048576) return (bps/1048576).toFixed(2)+' MB/s';
+  return (bps/1024).toFixed(0)+' KB/s';
+}
+function timeLeft(rem,bps) {
+  if(!bps||bps<1) return '∞';
+  const s=Math.round(rem/bps);
+  if(s>3600) return Math.floor(s/3600)+'h '+Math.floor((s%3600)/60)+'m';
+  if(s>60) return Math.floor(s/60)+'m '+s%60+'s';
+  return s+'s';
+}
+function detectCategory(url, name, override) {
+  if(override) return override;
+  const src = (name||url||'').toLowerCase();
+  const ext = src.split('.').pop();
+  return EXT_MAP[ext] || 'Programs';
+}
+function detectName(url) {
+  try { const u=new URL(url); const p=u.pathname.split('/').pop(); return p||'download_'+nextId; }
+  catch(e) { return url.split('/').pop()||'download_'+nextId; }
+}
+
+function addDownload() {
+  const url = document.getElementById('dlg-url').value.trim();
+  if(!url) { alert('Please enter a URL'); return; }
+  const nameInp = document.getElementById('dlg-name').value.trim();
+  const typeInp = document.getElementById('dlg-type').value;
+  const conn = parseInt(document.getElementById('dlg-conn').value)||8;
+  const fname = nameInp || detectName(url);
+  const cat = detectCategory(url, fname, typeInp);
+  const size = Math.round((Math.random()*500+10)*1048576);
+  const segs = Array.from({length:conn},()=>({filled:0,speed:Math.random()}));
+  const dl = {
+    id: nextId++, fname, url, cat, size,
+    downloaded: 0, status:'Downloading',
+    speed: 0, segs, conn, progress:0,
+  };
+  downloads.push(dl);
+  closeAddDialog();
+  render();
+}
+
+function openAddDialog() { document.getElementById('add-dialog').style.display='block'; document.getElementById('dlg-url').focus(); }
+function closeAddDialog() {
+  document.getElementById('add-dialog').style.display='none';
+  document.getElementById('dlg-url').value='';
+  document.getElementById('dlg-name').value='';
+  document.getElementById('dlg-type').value='';
+}
+
+function setCategory(cat, el) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-item').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function getVisible() {
+  if(currentCat==='all') return downloads;
+  const statCats=['Downloading','Completed','Paused','Queued'];
+  if(statCats.includes(currentCat)) return downloads.filter(d=>d.status===currentCat);
+  return downloads.filter(d=>d.cat===currentCat);
+}
+
+function selectRow(id) {
+  selectedId = selectedId===id ? null : id;
+  render();
+}
+
+function resumeSelected() { if(selectedId) { const d=downloads.find(x=>x.id===selectedId); if(d&&d.status==='Paused') d.status='Downloading'; render(); } }
+function pauseSelected() { if(selectedId) { const d=downloads.find(x=>x.id===selectedId); if(d&&d.status==='Downloading') d.status='Paused'; render(); } }
+function pauseAll() { downloads.forEach(d=>{if(d.status==='Downloading')d.status='Paused';}); render(); }
+function resumeAll() { downloads.forEach(d=>{if(d.status==='Paused')d.status='Downloading';}); render(); }
+function deleteSelected() { if(selectedId) { downloads=downloads.filter(x=>x.id!==selectedId); selectedId=null; render(); } }
+
+function render() {
+  const list = document.getElementById('file-list');
+  const visible = getVisible();
+  list.innerHTML = '';
+  visible.forEach(dl => {
+    const row = document.createElement('div');
+    row.className = 'dl-row' + (dl.id===selectedId?' selected':'');
+    row.onclick = ()=>selectRow(dl.id);
+    const [icon, icol] = CAT_ICONS[dl.cat]||['ti-file','#555'];
+    const pct = Math.round(dl.progress);
+    const segW = 100/dl.segs.length;
+    const segHtml = dl.segs.map((s,i)=>`<div class="seg" style="width:${segW}%;background:${dl.id===selectedId?'#88CCFF':'hsl('+Math.round(210+i*3)+',80%,'+Math.round(40+s.filled*20)+'%)'};height:${Math.round(60+s.filled*40)}%;"></div>`).join('');
+    const progHtml = dl.status==='Downloading'
+      ? `<div class="seg-bar">${segHtml}</div>`
+      : `<div class="prog-wrap"><div class="prog-fill" style="width:${pct}%;background:${pct>=100?'#00AA00':'#3399FF'};"></div></div>`;
+    row.innerHTML = `
+      <div class="dl-cell icon-cell"><i class="ti ${icon}" style="color:${icol}" aria-hidden="true"></i></div>
+      <div class="dl-cell name-cell"><div class="dl-fname">${dl.fname}</div><div class="dl-url">${dl.url}</div></div>
+      <div class="dl-cell">${sizeStr(dl.size)}</div>
+      <div class="dl-cell">${progHtml}<span style="font-size:9px;color:${dl.id===selectedId?'white':'#555'}">${pct}%</span></div>
+      <div class="dl-cell">${dl.status==='Downloading'?speedStr(dl.speed):'-'}</div>
+      <div class="dl-cell">${dl.status==='Downloading'?timeLeft(dl.size-dl.downloaded,dl.speed):'-'}</div>
+      <div class="dl-cell"><i class="ti ${STATUS_ICONS[dl.status]||'ti-clock'}" aria-hidden="true"></i> <span class="${STATUS_COLORS[dl.status]||''} status-txt">${dl.status}</span></div>
+    `;
+    list.appendChild(row);
+  });
+
+  updateCounts();
+  updateInfoPanel();
+  updateStatusBar();
+}
+
+function updateCounts() {
+  const cats = ['all','Downloading','Completed','Paused','Videos','Music','Images','Compressed','Documents','Programs'];
+  cats.forEach(c=>{
+    const el=document.getElementById('cnt-'+c);
+    if(!el) return;
+    if(c==='all') el.textContent=downloads.length;
+    else if(['Downloading','Completed','Paused'].includes(c)) el.textContent=downloads.filter(d=>d.status===c).length;
+    else el.textContent=downloads.filter(d=>d.cat===c).length;
+  });
+}
+
+function updateInfoPanel() {
+  const left = document.getElementById('info-left');
+  const segVis = document.getElementById('seg-visual');
+  const dl = downloads.find(d=>d.id===selectedId);
+  if(!dl) {
+    left.innerHTML='<h4>File Information</h4><div class="info-row"><span class="info-label">Select a download to view details</span></div>';
+    segVis.innerHTML='';
+    return;
+  }
+  left.innerHTML=`<h4>File Information</h4>
+    <div class="info-row"><span class="info-label">Name:</span><span class="info-val">${dl.fname}</span></div>
+    <div class="info-row"><span class="info-label">Size:</span><span class="info-val">${sizeStr(dl.size)}</span></div>
+    <div class="info-row"><span class="info-label">Category:</span><span class="info-val">${dl.cat}</span></div>
+    <div class="info-row"><span class="info-label">Connections:</span><span class="info-val">${dl.conn} segments</span></div>`;
+  segVis.innerHTML = dl.segs.map((s,i)=>`
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;">
+      <div style="width:100%;height:${Math.round(8+s.filled*28)}px;background:hsl(${120+i*8},70%,${dl.status==='Downloading'?'40%':'60%'});border-radius:1px;transition:height 0.3s;"></div>
+      <span style="font-size:8px;color:#666;">${i+1}</span>
+    </div>`).join('');
+}
+
+function updateStatusBar() {
+  const active = downloads.filter(d=>d.status==='Downloading');
+  const done = downloads.filter(d=>d.status==='Completed');
+  const totalSpeed = active.reduce((s,d)=>s+d.speed,0);
+  document.getElementById('stat-count').textContent = downloads.length+' downloads';
+  document.getElementById('stat-done').textContent = done.length+' completed';
+  document.getElementById('stat-speed').textContent = speedStr(totalSpeed)+' total';
+  drawGauge(totalSpeed);
+}
+
+// Gauge
+function drawGauge(bps) {
+  const canvas = document.getElementById('gauge');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W=90,H=50,cx=45,cy=48,r=38;
+  ctx.clearRect(0,0,W,H);
+  ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,2*Math.PI,false);
+  ctx.strokeStyle='#003300'; ctx.lineWidth=8; ctx.stroke();
+  const maxSpeed = 10*1048576;
+  const ratio = Math.min(bps/maxSpeed,1);
+  const angle = Math.PI + ratio*Math.PI;
+  ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,angle,false);
+  const g=ctx.createLinearGradient(cx-r,cy,cx+r,cy);
+  g.addColorStop(0,'#004400'); g.addColorStop(0.5,'#00AA00'); g.addColorStop(1,'#88FF44');
+  ctx.strokeStyle=g; ctx.lineWidth=8; ctx.stroke();
+  for(let i=0;i<=10;i++){
+    const a=Math.PI+i*Math.PI/10;
+    const x1=cx+Math.cos(a)*(r-10), y1=cy+Math.sin(a)*(r-10);
+    const x2=cx+Math.cos(a)*(r-14), y2=cy+Math.sin(a)*(r-14);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+    ctx.strokeStyle='#005500'; ctx.lineWidth=1; ctx.stroke();
+  }
+  const nA=Math.PI+ratio*Math.PI;
+  ctx.beginPath(); ctx.moveTo(cx,cy);
+  ctx.lineTo(cx+Math.cos(nA)*(r-6),cy+Math.sin(nA)*(r-6));
+  ctx.strokeStyle='#AAFFAA'; ctx.lineWidth=2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,4,0,2*Math.PI);
+  ctx.fillStyle='#00FF88'; ctx.fill();
+  const mb = bps/1048576;
+  document.getElementById('speed-label').textContent = mb.toFixed(2);
+}
+
+// Simulate download progress
+setInterval(()=>{
+  let changed = false;
+  downloads.forEach(dl=>{
+    if(dl.status!=='Downloading') return;
+    const baseSpeed = (Math.random()*2+0.5)*1048576;
+    dl.speed = baseSpeed*(0.9+Math.random()*0.2);
+    const chunk = dl.speed/10;
+    dl.downloaded = Math.min(dl.size, dl.downloaded+chunk);
+    dl.progress = dl.downloaded/dl.size*100;
+    dl.segs.forEach((s,i)=>{
+      s.speed = 0.8+Math.random()*0.4;
+      s.filled = dl.progress/100*(0.8+Math.random()*0.4);
+      s.filled = Math.min(1, s.filled);
+    });
+    if(dl.downloaded>=dl.size) { dl.status='Completed'; dl.progress=100; dl.speed=0; }
+    changed = true;
+  });
+  if(changed) render();
+}, 100);
+
+// Seed some downloads
+function seed() {
+  const demos = [
+    {fname:'Ubuntu_22.04_LTS.iso',url:'https://releases.ubuntu.com/ubuntu-22.04.iso',cat:'Programs',size:1073741824,status:'Downloading'},
+    {fname:'Holiday_Trip.mp4',url:'https://cdn.example.com/videos/holiday.mp4',cat:'Videos',size:524288000,status:'Downloading'},
+    {fname:'Album_Best_Hits.zip',url:'https://music.example.com/album.zip',cat:'Compressed',size:157286400,status:'Paused'},
+    {fname:'Wallpaper_Pack_2024.zip',url:'https://wallpapers.example.com/pack.zip',cat:'Compressed',size:83886080,status:'Completed'},
+    {fname:'Tutorial_Python.mp4',url:'https://learn.example.com/python.mp4',cat:'Videos',size:209715200,status:'Downloading'},
+    {fname:'Profile_Photo.jpg',url:'https://photos.example.com/me.jpg',cat:'Images',size:5242880,status:'Completed'},
+    {fname:'Setup_VLC.exe',url:'https://videolan.org/vlc/setup.exe',cat:'Programs',size:41943040,status:'Queued'},
+    {fname:'Report_Q4_2024.pdf',url:'https://docs.example.com/report.pdf',cat:'Documents',size:10485760,status:'Completed'},
+    {fname:'Coldplay_Music.mp3',url:'https://music.example.com/song.mp3',cat:'Music',size:8388608,status:'Downloading'},
+  ];
+  demos.forEach(d=>{
+    const conn=8;
+    const prog = d.status==='Completed'?100:d.status==='Paused'?Math.random()*60+10:Math.random()*80;
+    const dl={
+      id:nextId++,...d,
+      downloaded:d.size*(prog/100), progress:prog,
+      speed:d.status==='Downloading'?(Math.random()*3+0.5)*1048576:0,
+      segs:Array.from({length:conn},(_,i)=>({filled:Math.min(1,prog/100*(0.7+Math.random()*0.6)),speed:0.8+Math.random()*0.4})),
+      conn,
+    };
+    downloads.push(dl);
+  });
+  render();
+}
+seed();
+</script>
