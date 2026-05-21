@@ -1,0 +1,116 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier New', Courier, monospace, sans-serif;
+}
+body {
+    background-color: #050505;
+    color: #ffffff;
+    padding: 30px 15px;
+    display: flex;
+    justify-content: center;
+}
+.container {
+    max-width: 480px;
+    width: 100%;
+}
+header h1 {
+    color: #ff0055;
+    font-size: 2.3rem;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+header p {
+    color: #777;
+    font-size: 0.85rem;
+    margin-bottom: 25px;
+    text-align: center;
+    line-height: 1.4;
+}
+.scanner-box {
+    background: #0f0f0f;
+    border: 2px solid #1a1a1a;
+    padding: 12px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+}
+video {
+    width: 100%;
+    border-radius: 14px;
+    transform: scaleX(-1); /* Mirror view for natural selfies */
+    border: 1px solid #ff0055;
+}
+.btn-main {
+    width: 100%;
+    background: #ff0055;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 12px;
+    text-transform: uppercase;
+}
+#loading {
+    margin-top: 15px;
+    color: #ff0055;
+    font-weight: bold;
+    text-align: center;
+    animation: pulse 1s infinite;
+}
+.results-card {
+    background: #0f0f0f;
+    border: 2px solid #1a1a1a;
+    border-radius: 20px;
+    padding: 20px;
+}
+.results-card h2 {
+    font-size: 1.25rem;
+    color: #00ffcc;
+    margin-bottom: 18px;
+    text-align: center;
+}
+.metric {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    border-bottom: 1px solid #1a1a1a;
+    padding-bottom: 6px;
+    font-size: 0.95rem;
+}
+.label { color: #666; }
+.val { color: #fff; font-weight: bold; }
+.potential-box {
+    background: rgba(0, 255, 204, 0.06);
+    border: 1px dashed #00ffcc;
+    padding: 14px;
+    border-radius: 10px;
+    text-align: center;
+    margin: 20px 0;
+}
+.potential-box h3 { color: #00ffcc; font-size: 1.1rem; }
+.lock-section {
+    background: #1a0a10;
+    border: 1px solid #ff0055;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+.lock-section p { font-size: 0.85rem; margin-bottom: 12px; color: #ff99bb; }
+.btn-lock {
+    background: #00ffcc;
+    color: black;
+    border: none;
+    padding: 10px 22px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+@keyframes pulse {
+    50% { opacity: 0.4; }
+}

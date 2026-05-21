@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOOKSMAX AI - Face Rating Scan</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💀 LOOKSMAX AI</h1>
+            <p>Scan your face to discover your jawline tier, eye geometry, and glow-up blueprint.</p>
+        </header>
+
+        <div class="scanner-box">
+            <video id="webcam" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            
+            <button id="snap-btn" class="btn-main">Scan My Face 📸</button>
+            <div id="loading" style="display:none;">🧬 ANALYZING FACIAL STRUCTURE...</div>
+        </div>
+
+        <div id="results-card" class="results-card" style="display:none;">
+            <h2>🔬 Facial Analysis Report</h2>
+            <div class="metric"><span class="label">Facial Symmetry:</span> <span id="symmetry" class="val"></span></div>
+            <div class="metric"><span class="label">Eye Geometry:</span> <span id="eyes" class="val"></span></div>
+            <div class="metric"><span class="label">Jaw Definition:</span> <span id="jaw" class="val"></span></div>
+            
+            <div class="potential-box">
+                <h3>Glow-Up Potential: <span id="score"></span></h3>
+            </div>
+
+            <div class="lock-section">
+                <p>🔒 Your Personalized 1-Year Grooming Routine & Diet Plan is locked!</p>
+                <button onclick="openLocker()" class="btn-lock">Unlock Full Plan ✨</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('canvas');
+        const snapBtn = document.getElementById('snap-btn');
+        const loading = document.getElementById('loading');
+        const resultsCard = document.getElementById('results-card');
+
+        // Automatically trigger front camera
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => { alert("Please allow camera access to scan your face!"); });
+
+        snapBtn.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            snapBtn.style.display = 'none';
+            loading.style.display = 'block';
+
+            // Send to Flask backend
+            fetch('/analyze', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    setTimeout(() => { // 2-second scanning delay for realistic feel
+                        loading.style.display = 'none';
+                        resultsCard.style.display = 'block';
+                        
+                        document.getElementById('symmetry').innerText = data.facial_symmetry;
+                        document.getElementById('eyes').innerText = data.eye_structure;
+                        document.getElementById('jaw').innerText = data.jawline_score;
+                        document.getElementById('score').innerText = data.potential_score;
+                    }, 2000);
+                });
+        });
+
+        function openLocker() {
+            // Yahan aap apna OGAds ya CPAGrip ka URL daalenge
+            alert("Content Locker Link Triggered!\n\nUser yahan free app download karega ya survey poora karega aur aapko direct dollars milenge!");
+        }
+    </script>
+</body>
+</html>
